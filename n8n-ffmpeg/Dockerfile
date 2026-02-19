@@ -8,11 +8,17 @@ USER root
 COPY --from=ffmpeg /bin/ffmpeg /usr/local/bin/ffmpeg
 COPY --from=ffmpeg /bin/ffprobe /usr/local/bin/ffprobe
 
-# Librerías de Alpine (musl) que necesitan esos binarios
-COPY --from=ffmpeg /lib /ffmpeg-libs/lib
-COPY --from=ffmpeg /usr/lib /ffmpeg-libs/usr-lib
+# Librerías requeridas -> rutas estándar
+COPY --from=ffmpeg /lib /usr/local/lib/ffmpeg-lib
+COPY --from=ffmpeg /usr/lib /usr/local/lib/ffmpeg-usr-lib
 
-# Decirle al loader dónde encontrarlas
-ENV LD_LIBRARY_PATH=/ffmpeg-libs/lib:/ffmpeg-libs/usr-lib
+# Registrar rutas para el dynamic linker (musl)
+RUN printf "%s\n" \
+  "/usr/local/lib/ffmpeg-lib" \
+  "/usr/local/lib/ffmpeg-usr-lib" \
+  > /etc/ld-musl-x86_64.path
+
+# (Opcional pero recomendado) también lo dejamos en ENV por si acaso
+ENV LD_LIBRARY_PATH=/usr/local/lib/ffmpeg-lib:/usr/local/lib/ffmpeg-usr-lib
 
 USER node
