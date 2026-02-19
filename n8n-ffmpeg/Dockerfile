@@ -1,8 +1,2 @@
 FROM jrottenberg/ffmpeg:6.1-alpine AS ffmpeg
-
-FROM docker.n8n.io/n8nio/n8n:latest
-
-USER root
-COPY --from=ffmpeg /usr/local/bin/ffmpeg /usr/local/bin/ffmpeg
-COPY --from=ffmpeg /usr/local/bin/ffprobe /usr/local/bin/ffprobe
-USER node
+RUN which ffmpeg && which ffprobe && ls -la $(dirname $(which ffmpeg)) && ls -la $(dirname $(which ffprobe))
